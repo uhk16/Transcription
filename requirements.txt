@@ -1,0 +1,18 @@
+# Core Dependencies
+requests
+python-dotenv
+
+# Audio Processing
+pyaudio
+wave
+
+# File and Path Handling
+pathlib2
+
+# Additional Audio Format Support (Optional)
+# pydub
+# ffmpeg-python
+
+# Development and Testing (Optional)
+# pytest
+# pytest-cov
