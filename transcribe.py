@@ -83,6 +83,46 @@ class VoiceTranscriber:
             print(f"❌ Error processing file: {str(e)}")
             return False
 
+    def process_file_with_results(self, file_path):
+        """
+        Complete file processing workflow that returns both transcriptions
+        
+        Args:
+            file_path (str): Path to audio file
+            
+        Returns:
+            tuple: (original_transcription, polished_transcription) or (None, None) if failed
+        """
+        try:
+            # Expand user path (~)
+            file_path = os.path.expanduser(file_path)
+            
+            # Validate file exists
+            if not os.path.exists(file_path):
+                print(f"❌ File not found: {file_path}")
+                return None, None
+            
+            # Validate audio file
+            if not self._validate_audio_file(file_path):
+                return None, None
+            
+            # Transcribe
+            transcription = self._transcribe_file(file_path)
+            
+            if transcription:
+                # Polish the transcription
+                polished_transcription = self._polish_transcription(transcription)
+                
+                # Display results in the requested format
+                self._display_results(transcription, polished_transcription)
+                return transcription, polished_transcription
+            
+            return None, None
+            
+        except Exception as e:
+            print(f"❌ Error processing file: {str(e)}")
+            return None, None
+
     def record_and_transcribe(self):
         """
         Complete recording workflow: record, transcribe, and polish
@@ -118,6 +158,42 @@ class VoiceTranscriber:
         except Exception as e:
             print(f"❌ Error during recording workflow: {str(e)}")
             return False
+
+    def record_and_transcribe_with_results(self):
+        """
+        Complete recording workflow that returns both transcriptions
+        
+        Returns:
+            tuple: (original_transcription, polished_transcription) or (None, None) if failed
+        """
+        try:
+            # Record audio
+            recorded_file = self._record_audio()
+            
+            if not recorded_file:
+                return None, None
+            
+            # Transcribe
+            transcription = self._transcribe_file(recorded_file)
+            
+            if transcription:
+                # Polish the transcription
+                polished_transcription = self._polish_transcription(transcription)
+                
+                # Display results in the requested format
+                self._display_results(transcription, polished_transcription)
+                
+                # Clean up recording file
+                self._cleanup_file(recorded_file)
+                return transcription, polished_transcription
+            
+            # Clean up even if transcription failed
+            self._cleanup_file(recorded_file)
+            return None, None
+            
+        except Exception as e:
+            print(f"❌ Error during recording workflow: {str(e)}")
+            return None, None
 
     def _display_results(self, original_transcription, polished_transcription):
         """
